@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { GetStaticProps } from 'next'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import { baseAPI } from '../../constant'
 import { User } from '../../model/user.model'
 
@@ -9,6 +10,13 @@ type Prop = {
 }
 
 function UsersComponent(props: Prop) {
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		dispatch({ type: 'GET_USERS', payload: props.users })
+	}, [dispatch, props.users])
+
+
 	return (
 		<div className="flex flex-col justify-start items-center bg-white rounded p-4 h-full">
 			<h1 className="text-2xl m-5 text-gray-500">Users Page</h1>
