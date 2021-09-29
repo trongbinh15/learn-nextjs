@@ -3,10 +3,10 @@ import 'tailwindcss/tailwind.css'
 import type { AppProps } from 'next/app'
 import Layout from '../components/layout'
 import { Provider } from 'react-redux';
-import { useStore } from '../redux/store';
+import { useStore } from './store/store';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  console.log('pageProps:', pageProps);
+  console.log('pageProps:', pageProps)
   const store = useStore(pageProps.initialReduxState)
   return (
     <Provider store={store}>

@@ -1,1 +1,1 @@
-export const baseAPI = 'http://localhost:3004';
+export const jsonServerAPI = 'http://localhost:3004';
