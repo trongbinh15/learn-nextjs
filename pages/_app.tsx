@@ -6,7 +6,6 @@ import { Provider } from 'react-redux';
 import { useStore } from './store/store';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  console.log('pageProps:', pageProps)
   const store = useStore(pageProps.initialReduxState)
   return (
     <Provider store={store}>

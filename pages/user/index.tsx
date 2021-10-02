@@ -24,16 +24,23 @@ function UsersComponent() {
 		dispatch(deleteUserAsync(id));
 	}
 
+	// eslint-disable-next-line react/display-name
+	const EditButton = React.forwardRef<HTMLAnchorElement, any>(({ onClick, href }, ref) => {
+		return (
+			<a href={href} onClick={onClick} ref={ref} className='w-4'>
+				<FontAwesomeIcon icon={faEdit} className="btn edit" title="Edit user" />
+			</a>
+		)
+	})
+
 	return (
-		<>
-			<h1>User List</h1>
-			<div className="user-list">
-				<div className="add-new">
-					<Link href='/new' passHref>
-						<button className="btn">Add new</button>
-					</Link>
-				</div>
-				<table>
+		<div className='flex flex-col items-center justify-center p-4 bg-white rounded'>
+			<h1 className='text-xl'>User List</h1>
+			<div className="m-2">
+				<Link href={{ pathname: `/user/new` }} passHref>
+					<button className="p-1 border-2 border-blue-300 rounded hover:border-blue-800 w-max">Add new</button>
+				</Link>
+				<table className='mt-5'>
 					<thead>
 						<tr>
 							<th>User Name</th>
@@ -49,18 +56,20 @@ function UsersComponent() {
 								<td>{user.phone}</td>
 								<td>{user.email}</td>
 								<td width="100px" >
-									<div className="action-group">
-										<Link href={`/${user.id}`} passHref>
-											<FontAwesomeIcon icon={faEdit} className="btn edit" title="Edit user" />
+									<div className="flex items-center justify-center space-x-2">
+										<Link href={{ pathname: `/user/${user.id}` }} passHref>
+											<EditButton />
 										</Link>
-										<FontAwesomeIcon icon={faTrash} className="btn delete" title="Delete user" onClick={() => deleteUser(user.id)} />
+										<button className='w-4'>
+											<FontAwesomeIcon icon={faTrash} className="btn delete" title="Delete user" onClick={() => deleteUser(user.id)} />
+										</button>
 									</div>
 								</td>
 							</tr>)}
 					</tbody>
 				</table>
 			</div>
-		</>
+		</div>
 	)
 }
 

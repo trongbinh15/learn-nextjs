@@ -11,9 +11,6 @@ function NavBar() {
 				<li className="text-base font-medium text-gray-500 hover:text-gray-900">
 					<Link href='/user'>User</Link>
 				</li>
-				<li className="text-base font-medium text-gray-500 hover:text-gray-900">
-					<Link href='/task'>Task</Link>
-				</li>
 			</ul>
 		</nav>
 	)
