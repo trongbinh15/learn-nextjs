@@ -6,9 +6,10 @@ import { cors } from "../../../lib/init-middleware"
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   await cors(req, res)
   const { method, body } = req;
+  console.log('body:', body)
   const { id } = req.query;
 
-  const baseUrl = jsonServerAPI + "/users";
+  const baseUrl = jsonServerAPI + "/tasks";
 
   switch (method) {
     case 'GET':

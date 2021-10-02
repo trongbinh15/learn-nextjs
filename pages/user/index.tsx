@@ -1,53 +1,76 @@
-import axios from 'axios'
-import { GetStaticProps } from 'next'
-import React from 'react'
-import { baseAPI } from '../../constant'
-import { User } from '../../model/user.model'
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Link from 'next/link'
+import { useRouter } from 'next/router';
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchTasksAsync } from '../store/slices/taskSlice'
+import { deleteUserAsync, fetchUsersAsync, usersSelector } from '../store/slices/usersSlice'
+import { RootState } from '../store/store'
 
-type Prop = {
-	users: User[]
-}
+function UsersComponent() {
 
-function UsersComponent(props: Prop) {
+	const dispatch = useDispatch();
+	const router = useRouter();
+
+	useEffect(() => {
+		dispatch(fetchUsersAsync());
+		dispatch(fetchTasksAsync());
+	}, [dispatch]);
+
+	const users = useSelector((state: RootState) => usersSelector(state.users));
+
+	const deleteUser = (id: string) => {
+		dispatch(deleteUserAsync(id));
+	}
+
+	// eslint-disable-next-line react/display-name
+	const EditButton = React.forwardRef<HTMLAnchorElement, any>(({ onClick, href }, ref) => {
+		return (
+			<a href={href} onClick={onClick} ref={ref} className='w-4'>
+				<FontAwesomeIcon icon={faEdit} className="btn edit" title="Edit user" />
+			</a>
+		)
+	})
+
 	return (
-		<div className="flex flex-col justify-start items-center bg-white rounded p-4 h-full">
-			<h1 className="text-2xl m-5 text-gray-500">Users Page</h1>
-			<div className="flex justify-center items-center border-4 border-gray-200 rounded p-3 overflow-auto w-3/4">
-				<table className="table-auto border-collapse w-full">
+		<div className='flex flex-col items-center justify-center p-4 bg-white rounded'>
+			<h1 className='text-xl'>User List</h1>
+			<div className="m-2">
+				<Link href={{ pathname: `/user/new` }} passHref>
+					<button className="p-1 border-2 border-blue-300 rounded hover:border-blue-800 w-max">Add new</button>
+				</Link>
+				<table className='mt-5'>
 					<thead>
 						<tr>
-							<th className="text-left">Name</th>
-							<th className="text-left">Email</th>
-							<th className="text-left">Phone</th>
-							<th className="text-center">Action</th>
+							<th>User Name</th>
+							<th>Phone</th>
+							<th>Email</th>
+							<th>Actions</th>
 						</tr>
 					</thead>
 					<tbody>
-						{props.users.map((user: User) => (
+						{users.map(user =>
 							<tr key={user.id}>
 								<td>{user.name}</td>
-								<td>{user.email}</td>
 								<td>{user.phone}</td>
-								<td className="items-center"><button>Delete</button></td>
-							</tr>))}
+								<td>{user.email}</td>
+								<td width="100px" >
+									<div className="flex items-center justify-center space-x-2">
+										<Link href={{ pathname: `/user/${user.id}` }} passHref>
+											<EditButton />
+										</Link>
+										<button className='w-4'>
+											<FontAwesomeIcon icon={faTrash} className="btn delete" title="Delete user" onClick={() => deleteUser(user.id)} />
+										</button>
+									</div>
+								</td>
+							</tr>)}
 					</tbody>
 				</table>
 			</div>
 		</div>
 	)
-}
-
-export const getStaticProps: GetStaticProps = async () => {
-	const res = await axios.get<User[]>(baseAPI + '/users');
-	if (!res.data) {
-		return {
-			notFound: true,
-		}
-	}
-	return {
-		props: { users: res.data },
-		revalidate: 1,
-	}
 }
 
 export default UsersComponent
