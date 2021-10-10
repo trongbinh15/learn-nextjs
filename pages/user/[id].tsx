@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { IUser } from '../../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
-import { addUserAsync, updateUserAsync, userByIdSelector } from '../store/slices/usersSlice';
-import { addTaskAsync, deleteTaskAsync, ITask, taskByUserIdSelector, updateTaskAsync } from '../store/slices/taskSlice';
-import { RootState } from '../store/store';
+import { addUserAsync, updateUserAsync, userByIdSelector } from '../../store/slices/usersSlice';
+import { addTaskAsync, deleteTaskAsync, ITask, taskByUserIdSelector, updateTaskAsync } from '../../store/slices/taskSlice';
+import { RootState } from '../../store/store';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/router';

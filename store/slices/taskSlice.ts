@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { localApi } from '../../../config/api';
+import { localApi } from '../../config/api';
 
 
 export type ITask = {

@@ -3,8 +3,8 @@
     {
       "id": "403f2fe1-c512-4e68-b983-7febc11d8e60",
       "email": "trongbinhnguyen15@mgial.com",
-      "phone": "123455",
-      "name": "Binh 22"
+      "phone": "123",
+      "name": "Binh 2"
     },
     {
       "id": "44b01c38-05d9-4fb6-9e4d-85e1a94bd3fe",
@@ -13,10 +13,10 @@
       "name": "Tom"
     },
     {
-      "id": "1b96f170-e144-4465-88d7-4c78e06bf3e6",
-      "email": "C",
-      "phone": "B",
-      "name": "A12"
+      "id": "e44083be-2f59-4bcc-b5c0-dff2057166b8",
+      "email": "Binh",
+      "phone": "BInh",
+      "name": "Binh"
     }
   ],
   "tasks": [
@@ -39,16 +39,6 @@
       "id": "366aea0d-f2da-40a5-b625-40e4aca30702",
       "name": "New task 2",
       "userId": "403f2fe1-c512-4e68-b983-7febc11d8e60"
-    },
-    {
-      "id": "409d64d0-f645-4dab-bfda-904f16a1a645",
-      "name": "New task",
-      "userId": "1b96f170-e144-4465-88d7-4c78e06bf3e6"
-    },
-    {
-      "id": "d01f097d-62d0-4379-962b-b4ea2974cd7a",
-      "name": "234",
-      "userId": "1b96f170-e144-4465-88d7-4c78e06bf3e6"
     },
     {
       "id": "5fea7a70-668b-43ef-a3ae-d75fe6404959",

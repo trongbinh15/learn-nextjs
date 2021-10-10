@@ -1,7 +1,7 @@
-import { jsonServerAPI } from '../../../constant/index';
+import { jsonServerAPI } from '../../constant/index';
 import axios from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
-import { cors } from "../../../lib/init-middleware"
+import { cors } from "../../lib/init-middleware"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   await cors(req, res)

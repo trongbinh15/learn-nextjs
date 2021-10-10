@@ -4,12 +4,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchTasksAsync } from '../store/slices/taskSlice'
-import { deleteUserAsync, fetchUsersAsync, usersSelector } from '../store/slices/usersSlice'
-import { RootState } from '../store/store'
+import useAuthenticated from '../../hooks/useAuthenticated';
+import withSession from '../../lib/withSession';
+import { fetchTasksAsync } from '../../store/slices/taskSlice'
+import { deleteUserAsync, fetchUsersAsync, usersSelector } from '../../store/slices/usersSlice'
+import { RootState } from '../../store/store'
 
-function UsersComponent() {
-
+function UsersComponent(user: any) {
 	const dispatch = useDispatch();
 	const router = useRouter();
 
@@ -17,6 +18,12 @@ function UsersComponent() {
 		dispatch(fetchUsersAsync());
 		dispatch(fetchTasksAsync());
 	}, [dispatch]);
+
+	// useEffect(() => {
+	// 	if (!isAuthenticated) {
+	// 		router.push('/login');
+	// 	}
+	// }, [isAuthenticated, router]);
 
 	const users = useSelector((state: RootState) => usersSelector(state.users));
 
@@ -32,6 +39,7 @@ function UsersComponent() {
 			</a>
 		)
 	})
+
 
 	return (
 		<div className='flex flex-col items-center justify-center p-4 bg-white rounded'>
@@ -75,3 +83,17 @@ function UsersComponent() {
 
 export default UsersComponent
 
+export const getServerSideProps = withSession(async ({ req, res }: any) => {
+	const user = req.session.get("user");
+
+	if (user === undefined) {
+		res.setHeader("location", "/login");
+		res.statusCode = 302;
+		res.end();
+		return { props: {} };
+	}
+
+	return {
+		props: { user: req.session.get("user") },
+	};
+});

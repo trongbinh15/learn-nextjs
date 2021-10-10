@@ -6,11 +6,13 @@ import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { useMemo } from 'react';
 import thunkMiddleware from 'redux-thunk'
+import authSlice from './slices/authSlice';
 
 const rootReducer = combineReducers({
 	users: usersReducer,
 	tasks: tasksReducer,
-	base: baseSlice
+	base: baseSlice,
+	auth: authSlice
 });
 
 let store: any;
@@ -37,7 +39,7 @@ export const initializeStore = (preloadState: any) => {
 	return _store;
 }
 
-export function useStore(initialState: any) {
+export default function useStore(initialState: any) {
 	const store = useMemo(() => initializeStore(initialState), [initialState]);
 	return store;
 }
