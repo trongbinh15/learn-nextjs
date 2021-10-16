@@ -6,14 +6,11 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { jsonServerAPI } from '../../constant';
 import { IUser } from '../../models/user.model';
-import { ITask, setTasks } from '../store/slices/taskSlice'
-import { deleteUserAsync, setUsers, usersSelector } from '../store/slices/usersSlice'
-import { RootState, wrapper } from '../store/store'
 import useAuthenticated from '../../hooks/useAuthenticated';
 import withSession from '../../lib/withSession';
-import { fetchTasksAsync } from '../../store/slices/taskSlice'
-import { deleteUserAsync, fetchUsersAsync, usersSelector } from '../../store/slices/usersSlice'
-import { RootState } from '../../store/store'
+import { fetchTasksAsync, ITask, setTasks } from '../../store/slices/taskSlice'
+import { deleteUserAsync, fetchUsersAsync, setUsers, usersSelector } from '../../store/slices/usersSlice'
+import { RootState, wrapper } from '../../store/store';
 
 function UsersComponent(user: any) {
 	const dispatch = useDispatch();
@@ -75,29 +72,34 @@ function UsersComponent(user: any) {
 }
 
 
-export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ req, res }) => {
+export const getServerSideProps = wrapper.getServerSideProps((store) => withSession(async ({ req, res }) => {
 	const userEndpoint = jsonServerAPI + "/users";
 	const userRes = await axios.get<IUser[]>(userEndpoint);
 	store.dispatch(setUsers(userRes.data));
-export const getServerSideProps = withSession(async ({ req, res }: any) => {
+
 	const user = req.session.get("user");
+	console.log('user:', user)
 
 	const taskEndpoint = jsonServerAPI + "/tasks";
 	const taskRes = await axios.get<ITask[]>(taskEndpoint);
 	store.dispatch(setTasks(taskRes.data));
 
-	return { props: {} };
-});
 
-export default UsersComponent;
 	if (user === undefined) {
 		res.setHeader("location", "/login");
 		res.statusCode = 302;
 		res.end();
-		return { props: {} };
+		return {
+			redirect: {
+				destination: "/login",
+				permanent: false,
+			},
+		};
+	} else if (user) {
+		return {
+			props: { user: req.session.get("user") },
+		};
 	}
+}));
 
-	return {
-		props: { user: req.session.get("user") },
-	};
-});
+export default UsersComponent;

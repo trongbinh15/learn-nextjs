@@ -2,9 +2,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { withIronSession, Session } from "next-iron-session";
 type NextIronRequest = NextApiRequest & { session: Session };
-export type NextIronHandler = (
+
+type Param = {
   req: NextIronRequest,
   res: NextApiResponse,
+}
+
+export type NextIronHandler = (
+  param: Param
 ) => void | Promise<any>;
 
 

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { localApiRoute } from '../../../config/api';
+import { localApiRoute } from '../../config/api';
 
 
 export type ITask = {

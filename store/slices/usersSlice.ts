@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { localApiRoute } from '../../../config/api';
-import { IUser } from '../../../models/user.model';
+import { localApiRoute } from '../../config/api';
+import { IUser } from '../../models/user.model';
 
 export type UserState = {
   users: IUser[],
