@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { localApi } from '../../config/api';
-import { IUser } from '../../models/user.model';
+import { localApiRoute } from '../../../config/api';
+import { IUser } from '../../../models/user.model';
 
 export type UserState = {
   users: IUser[],
@@ -11,7 +11,7 @@ export const fetchUsersAsync = createAsyncThunk(
   'users/fetchUsers',
   async (_, thunkApi) => {
     try {
-      const response = await axios.get<IUser[]>(localApi.getAllUsers);
+      const response = await axios.get<IUser[]>(localApiRoute.getAllUsers);
       return response.data;
     } catch (error: any) {
       if (!error.response) {
@@ -26,9 +26,10 @@ export const deleteUserAsync = createAsyncThunk(
   'users/deleteUser',
   async (id: string, thunkApi) => {
     try {
-      await axios.delete(localApi.deleteUser.replace('{id}', id));
+      await axios.delete(localApiRoute.deleteUser.replace('{id}', id));
       return id;
     } catch (error: any) {
+      console.log('error:', error)
       if (!error.response) {
         throw error;
       }
@@ -41,7 +42,7 @@ export const addUserAsync = createAsyncThunk(
   'users/addUser',
   async (model: IUser, thunkApi) => {
     try {
-      const response = await axios.post<IUser>(localApi.addUser, model);
+      const response = await axios.post<IUser>(localApiRoute.addUser, model);
       return response.data;
     } catch (error: any) {
       if (!error.response) {
@@ -56,7 +57,7 @@ export const updateUserAsync = createAsyncThunk(
   'users/updateUser',
   async (model: IUser, thunkApi) => {
     try {
-      const response = await axios.put<IUser>(localApi.updateUser.replace('{id}', model.id), model);
+      const response = await axios.put<IUser>(localApiRoute.updateUser.replace('{id}', model.id), model);
       return { id: model.id, model: response.data };
     } catch (error: any) {
       if (!error.response) {
@@ -75,7 +76,9 @@ const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-
+    setUsers: (state, action: PayloadAction<IUser[]>) => {
+      state.users = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -109,5 +112,6 @@ export const userByIdSelector = createSelector(users, userById,
   (users, id) => users.find(x => x.id === id)
 );
 
+export const { setUsers } = usersSlice.actions;
 
 export default usersSlice.reducer;

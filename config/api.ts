@@ -1,4 +1,4 @@
-export const localApi = {
+export const localApiRoute = {
   getAllUsers: "/api/users",
   getUserById: "/api/users/?id={id}",
   addUser: "/api/users",

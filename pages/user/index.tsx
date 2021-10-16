@@ -1,9 +1,14 @@
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import axios from 'axios';
 import Link from 'next/link'
-import { useRouter } from 'next/router';
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { jsonServerAPI } from '../../constant';
+import { IUser } from '../../models/user.model';
+import { ITask, setTasks } from '../store/slices/taskSlice'
+import { deleteUserAsync, setUsers, usersSelector } from '../store/slices/usersSlice'
+import { RootState, wrapper } from '../store/store'
 import useAuthenticated from '../../hooks/useAuthenticated';
 import withSession from '../../lib/withSession';
 import { fetchTasksAsync } from '../../store/slices/taskSlice'
@@ -12,18 +17,6 @@ import { RootState } from '../../store/store'
 
 function UsersComponent(user: any) {
 	const dispatch = useDispatch();
-	const router = useRouter();
-
-	useEffect(() => {
-		dispatch(fetchUsersAsync());
-		dispatch(fetchTasksAsync());
-	}, [dispatch]);
-
-	// useEffect(() => {
-	// 	if (!isAuthenticated) {
-	// 		router.push('/login');
-	// 	}
-	// }, [isAuthenticated, router]);
 
 	const users = useSelector((state: RootState) => usersSelector(state.users));
 
@@ -81,11 +74,22 @@ function UsersComponent(user: any) {
 	)
 }
 
-export default UsersComponent
 
+export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ req, res }) => {
+	const userEndpoint = jsonServerAPI + "/users";
+	const userRes = await axios.get<IUser[]>(userEndpoint);
+	store.dispatch(setUsers(userRes.data));
 export const getServerSideProps = withSession(async ({ req, res }: any) => {
 	const user = req.session.get("user");
 
+	const taskEndpoint = jsonServerAPI + "/tasks";
+	const taskRes = await axios.get<ITask[]>(taskEndpoint);
+	store.dispatch(setTasks(taskRes.data));
+
+	return { props: {} };
+});
+
+export default UsersComponent;
 	if (user === undefined) {
 		res.setHeader("location", "/login");
 		res.statusCode = 302;
