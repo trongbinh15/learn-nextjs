@@ -1,22 +1,18 @@
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import axios from 'axios';
 import Link from 'next/link'
-import { useRouter } from 'next/router';
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchTasksAsync } from '../store/slices/taskSlice'
-import { deleteUserAsync, fetchUsersAsync, usersSelector } from '../store/slices/usersSlice'
-import { RootState } from '../store/store'
+import { jsonServerAPI } from '../../constant';
+import { IUser } from '../../models/user.model';
+import { ITask, setTasks } from '../store/slices/taskSlice'
+import { deleteUserAsync, setUsers, usersSelector } from '../store/slices/usersSlice'
+import { RootState, wrapper } from '../store/store'
 
 function UsersComponent() {
 
 	const dispatch = useDispatch();
-	const router = useRouter();
-
-	useEffect(() => {
-		dispatch(fetchUsersAsync());
-		dispatch(fetchTasksAsync());
-	}, [dispatch]);
 
 	const users = useSelector((state: RootState) => usersSelector(state.users));
 
@@ -73,5 +69,17 @@ function UsersComponent() {
 	)
 }
 
-export default UsersComponent
 
+export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ req, res }) => {
+	const userEndpoint = jsonServerAPI + "/users";
+	const userRes = await axios.get<IUser[]>(userEndpoint);
+	store.dispatch(setUsers(userRes.data));
+
+	const taskEndpoint = jsonServerAPI + "/tasks";
+	const taskRes = await axios.get<ITask[]>(taskEndpoint);
+	store.dispatch(setTasks(taskRes.data));
+
+	return { props: {} };
+});
+
+export default UsersComponent;

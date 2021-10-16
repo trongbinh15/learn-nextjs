@@ -3,16 +3,13 @@ import 'tailwindcss/tailwind.css'
 import type { AppProps } from 'next/app'
 import Layout from '../components/layout'
 import { Provider } from 'react-redux';
-import { useStore } from './store/store';
+import { wrapper } from './store/store';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const store = useStore(pageProps.initialReduxState)
   return (
-    <Provider store={store}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </Provider>
+    <Layout>
+      <Component {...pageProps} />
+    </Layout>
   );
 }
-export default MyApp
+export default wrapper.withRedux(MyApp)

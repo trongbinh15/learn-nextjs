@@ -4,46 +4,54 @@ import tasksReducer from './slices/taskSlice';
 import baseSlice from './slices/baseSlice';
 import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import { useMemo } from 'react';
 import thunkMiddleware from 'redux-thunk'
+import { createWrapper, HYDRATE } from 'next-redux-wrapper';
 
-const rootReducer = combineReducers({
+
+const bindMiddleware = (middleware: any[]) => {
+	if (process.env.NODE_ENV !== 'production') {
+		return composeWithDevTools(applyMiddleware(...middleware))
+	}
+	return applyMiddleware(...middleware)
+}
+
+const combinedReducer = combineReducers({
 	users: usersReducer,
 	tasks: tasksReducer,
 	base: baseSlice
 });
 
+
+const reducer = (state: any, action: any) => {
+	if (action.type === HYDRATE) {
+		const nextState = {
+			...state, // use previous state
+			...action.payload, // apply delta from hydration
+		}
+		if (state.users.length === 0) {
+			nextState.users = action.payload.users;
+		}
+		if (state.tasks.length === 0) {
+			nextState.tasks = action.payload.tasks;
+		}
+		return nextState;
+	} else {
+		return combinedReducer(state, action)
+	}
+}
+
 let store: any;
 
-function initStore(initialState: any) {
-	return createStore(rootReducer, initialState, composeWithDevTools(applyMiddleware(thunkMiddleware)));
-}
-
-export const initializeStore = (preloadState: any) => {
-	let _store = store ?? initStore(preloadState);
-
-	if (preloadState && store) {
-		_store = initStore({
-			...store.getState(),
-			...preloadState
-		})
-		_store = undefined;
-	}
-
-	// For SSG and SSR always create a new store
-	if (typeof window === 'undefined') return _store;
-	// Create the store once in the client
-	if (!store) store = _store;
-	return _store;
-}
-
-export function useStore(initialState: any) {
-	const store = useMemo(() => initializeStore(initialState), [initialState]);
+function initStore() {
+	store = createStore(reducer, bindMiddleware([thunkMiddleware]));
 	return store;
 }
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
+// // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+// // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch
+
+export const wrapper = createWrapper(initStore);
+
 
