@@ -14,7 +14,6 @@ import axios from 'axios';
 import { isAuthenticatedSelector } from '../../store/slices/authSlice';
 
 function UserDetailComponent({ user }: InferGetStaticPropsType<typeof getStaticProps>) {
-	console.log('user:', user)
 	const dispatch = useDispatch();
 	const nameRef = useRef<HTMLInputElement>(null);
 	const phoneRef = useRef<HTMLInputElement>(null);
@@ -22,13 +21,12 @@ function UserDetailComponent({ user }: InferGetStaticPropsType<typeof getStaticP
 	const [isNew, setIsNew] = useState(true);
 	const router = useRouter();
 	const { id } = router.query;
-	// const user = useSelector((state: RootState) => userByIdSelector(state.users, id as string));
 	const tasks = useSelector((state: RootState) => taskByUserIdSelector(state.tasks, id as string));
 	const isAuthenticated = useSelector((state: RootState) => isAuthenticatedSelector(state.auth));
 
 	useEffect(() => {
-		if (isAuthenticated) {
-			router.push('/', undefined, { shallow: true });
+		if (!isAuthenticated) {
+			router.push('/login', undefined, { shallow: true });
 		}
 	}, [isAuthenticated, router])
 
@@ -41,6 +39,7 @@ function UserDetailComponent({ user }: InferGetStaticPropsType<typeof getStaticP
 			setIsNew(true);
 		}
 	}, [id])
+
 
 	const handleSubmit = (event: any) => {
 		event.preventDefault();
@@ -87,6 +86,7 @@ function UserDetailComponent({ user }: InferGetStaticPropsType<typeof getStaticP
 	return (
 		<div className='container flex flex-col items-center justify-center p-4 bg-white rounded'>
 			<h1 className="text-xl">{isNew ? 'Add New User' : 'User Detail'}</h1>
+			<h1>{isAuthenticated ? "authen" : 'nah'}</h1>
 			<div className="m-2">
 				<form onSubmit={handleSubmit}>
 					<div className="m-2">
@@ -158,7 +158,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 	return {
 		paths: params,
-		fallback: false,
+		fallback: true,
 	}
 }
 
@@ -174,7 +174,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 	return {
 		props: {
 			user
-		}
+		},
+		revalidate: 10
 	}
 }
 

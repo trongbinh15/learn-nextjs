@@ -2,7 +2,7 @@ import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import axios from 'axios';
 import Link from 'next/link'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { jsonServerAPI } from '../../constant';
 import { IUser } from '../../models/user.model';
@@ -25,8 +25,8 @@ function UsersComponent() {
 	}
 
 	useEffect(() => {
-		if (isAuthenticated) {
-			router.push('/', undefined, { shallow: true });
+		if (!isAuthenticated) {
+			router.push('/login', undefined, { shallow: true });
 		}
 	}, [isAuthenticated, router])
 
@@ -83,7 +83,6 @@ function UsersComponent() {
 
 export const getServerSideProps = wrapper.getServerSideProps((store) => withSession(async ({ req, res }: any) => {
 	const user = req.session.get("user");
-	console.log('user:', user)
 
 	if (user === undefined) {
 		store.dispatch(clearAuthenticated());

@@ -1,8 +1,9 @@
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { isAuthenticatedSelector, loginAsync } from '../../store/slices/authSlice';
-import { RootState } from '../../store/store';
+import withSession from '../../lib/withSession';
+import { clearAuthenticated, isAuthenticatedSelector, loginAsync, setAuthenticated } from '../../store/slices/authSlice';
+import { RootState, wrapper } from '../../store/store';
 
 function Login() {
 
@@ -49,5 +50,26 @@ function Login() {
     </div>
   )
 }
+
+export const getServerSideProps = wrapper.getServerSideProps((store) => withSession(async ({ req, res }: any) => {
+  const user = req.session.get("user");
+
+  if (user === undefined) {
+    store.dispatch(clearAuthenticated());
+
+    return {
+      props: {
+        user: null
+      }
+    }
+
+  } else if (user) {
+    store.dispatch(setAuthenticated({ isAuthenticated: true, userName: user.login }));
+
+    return {
+      props: { user: req.session.get("user") },
+    };
+  }
+}));
 
 export default Login
