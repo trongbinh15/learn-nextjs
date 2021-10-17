@@ -2,14 +2,19 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { IUser } from '../../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
-import { addUserAsync, updateUserAsync, userByIdSelector } from '../../store/slices/usersSlice';
+import { addUserAsync, updateUserAsync } from '../../store/slices/usersSlice';
 import { addTaskAsync, deleteTaskAsync, ITask, taskByUserIdSelector, updateTaskAsync } from '../../store/slices/taskSlice';
 import { RootState } from '../../store/store';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/router';
+import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
+import { jsonServerAPI } from '../../constant';
+import axios from 'axios';
+import { isAuthenticatedSelector } from '../../store/slices/authSlice';
 
-function UserDetailComponent() {
+function UserDetailComponent({ user }: InferGetStaticPropsType<typeof getStaticProps>) {
+	console.log('user:', user)
 	const dispatch = useDispatch();
 	const nameRef = useRef<HTMLInputElement>(null);
 	const phoneRef = useRef<HTMLInputElement>(null);
@@ -17,8 +22,16 @@ function UserDetailComponent() {
 	const [isNew, setIsNew] = useState(true);
 	const router = useRouter();
 	const { id } = router.query;
-	const user = useSelector((state: RootState) => userByIdSelector(state.users, id as string));
+	// const user = useSelector((state: RootState) => userByIdSelector(state.users, id as string));
 	const tasks = useSelector((state: RootState) => taskByUserIdSelector(state.tasks, id as string));
+	const isAuthenticated = useSelector((state: RootState) => isAuthenticatedSelector(state.auth));
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			router.push('/', undefined, { shallow: true });
+		}
+	}, [isAuthenticated, router])
+
 
 	useEffect(() => {
 		nameRef.current?.focus();
@@ -134,6 +147,35 @@ function UserDetailComponent() {
 			}
 		</div >
 	)
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+	const userEndpoint = jsonServerAPI + "/users";
+	const userRes = await axios.get<IUser[]>(userEndpoint);
+
+	const ids = userRes.data.map(user => user.id);
+	const params = ids.map(id => ({ params: { id } }));
+
+	return {
+		paths: params,
+		fallback: false,
+	}
+}
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+	if (!params || params.id === 'new') {
+		return { props: { user: null } }
+	}
+
+	const userEndpoint = jsonServerAPI + "/users" + "/" + params.id;
+	const res = await axios.get<IUser>(userEndpoint);
+	const user = res.data;
+
+	return {
+		props: {
+			user
+		}
+	}
 }
 
 export default UserDetailComponent

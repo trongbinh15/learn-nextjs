@@ -2,24 +2,33 @@ import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import axios from 'axios';
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { jsonServerAPI } from '../../constant';
 import { IUser } from '../../models/user.model';
-import useAuthenticated from '../../hooks/useAuthenticated';
 import withSession from '../../lib/withSession';
-import { fetchTasksAsync, ITask, setTasks } from '../../store/slices/taskSlice'
-import { deleteUserAsync, fetchUsersAsync, setUsers, usersSelector } from '../../store/slices/usersSlice'
+import { ITask, setTasks } from '../../store/slices/taskSlice'
+import { deleteUserAsync, setUsers, usersSelector } from '../../store/slices/usersSlice'
 import { RootState, wrapper } from '../../store/store';
+import { clearAuthenticated, isAuthenticatedSelector, setAuthenticated } from '../../store/slices/authSlice';
+import { useRouter } from 'next/router';
 
-function UsersComponent(user: any) {
+function UsersComponent() {
 	const dispatch = useDispatch();
+	const router = useRouter();
 
 	const users = useSelector((state: RootState) => usersSelector(state.users));
+	const isAuthenticated = useSelector((state: RootState) => isAuthenticatedSelector(state.auth));
 
 	const deleteUser = (id: string) => {
 		dispatch(deleteUserAsync(id));
 	}
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			router.push('/', undefined, { shallow: true });
+		}
+	}, [isAuthenticated, router])
 
 	// eslint-disable-next-line react/display-name
 	const EditButton = React.forwardRef<HTMLAnchorElement, any>(({ onClick, href }, ref) => {
@@ -72,23 +81,13 @@ function UsersComponent(user: any) {
 }
 
 
-export const getServerSideProps = wrapper.getServerSideProps((store) => withSession(async ({ req, res }) => {
-	const userEndpoint = jsonServerAPI + "/users";
-	const userRes = await axios.get<IUser[]>(userEndpoint);
-	store.dispatch(setUsers(userRes.data));
-
+export const getServerSideProps = wrapper.getServerSideProps((store) => withSession(async ({ req, res }: any) => {
 	const user = req.session.get("user");
 	console.log('user:', user)
 
-	const taskEndpoint = jsonServerAPI + "/tasks";
-	const taskRes = await axios.get<ITask[]>(taskEndpoint);
-	store.dispatch(setTasks(taskRes.data));
-
-
 	if (user === undefined) {
-		res.setHeader("location", "/login");
-		res.statusCode = 302;
-		res.end();
+		store.dispatch(clearAuthenticated());
+
 		return {
 			redirect: {
 				destination: "/login",
@@ -96,6 +95,16 @@ export const getServerSideProps = wrapper.getServerSideProps((store) => withSess
 			},
 		};
 	} else if (user) {
+		store.dispatch(setAuthenticated({ isAuthenticated: true, userName: user.login }));
+
+		const userEndpoint = jsonServerAPI + "/users";
+		const userRes = await axios.get<IUser[]>(userEndpoint);
+		store.dispatch(setUsers(userRes.data));
+
+		const taskEndpoint = jsonServerAPI + "/tasks";
+		const taskRes = await axios.get<ITask[]>(taskEndpoint);
+		store.dispatch(setTasks(taskRes.data));
+
 		return {
 			props: { user: req.session.get("user") },
 		};

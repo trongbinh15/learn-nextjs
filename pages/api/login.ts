@@ -1,9 +1,9 @@
 import axios from "axios"
-import { cors } from "../../lib/init-middleware"
+import { cors } from "../../lib/init-middleware";
 import withSession from "../../lib/withSession"
 import { GithubUserModel } from "../../models/user.model";
 
-export default withSession(async (req, res) => {
+export default withSession(async (req: any, res: any) => {
   await cors(req, res);
   const { username } = await req.query;
   const { method } = req;

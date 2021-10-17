@@ -9,11 +9,13 @@ type Param = {
 }
 
 export type NextIronHandler = (
-  param: Param
+  // req: NextIronRequest,
+  // res: NextApiResponse,
+  param: Param,
 ) => void | Promise<any>;
 
 
-const withSession = (handler: NextIronHandler) =>
+const withSession = (handler: any) =>
   withIronSession(handler, {
     password: process.env.SECRET_COOKIE_PASSWORD || "",
     cookieName: 'next.js/examples/with-iron-session',

@@ -26,17 +26,27 @@ const combinedReducer = combineReducers({
 
 const reducer = (state: any, action: any) => {
 	if (action.type === HYDRATE) {
+
+		let users = action.payload.users;
+		let tasks = action.payload.tasks;
+
+		if (state.users.users.length !== 0) {
+			users = state.users;
+		}
+
+		if (state.tasks.tasks.length !== 0) {
+			tasks = state.tasks;
+		}
+
 		const nextState = {
 			...state, // use previous state
 			...action.payload, // apply delta from hydration
+			users,
+			tasks
 		}
-		if (state.users.length === 0) {
-			nextState.users = action.payload.users;
-		}
-		if (state.tasks.length === 0) {
-			nextState.tasks = action.payload.tasks;
-		}
+
 		return nextState;
+
 	} else {
 		return combinedReducer(state, action)
 	}
@@ -54,6 +64,6 @@ export type RootState = ReturnType<typeof store.getState>
 // // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch
 
-export const wrapper = createWrapper(initStore);
+export const wrapper = createWrapper(initStore, { debug: true });
 
 

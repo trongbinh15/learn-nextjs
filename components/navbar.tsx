@@ -1,22 +1,25 @@
 import Link from 'next/link'
-import React from 'react'
-import Router from 'next/router';
-import { useDispatch } from 'react-redux';
-import { logoutAsync } from '../store/slices/authSlice';
-import withSession from '../lib/withSession';
-import { GithubUserModel } from '../models/user.model';
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
+import { isAuthenticatedSelector, logoutAsync, usernameSelector } from '../store/slices/authSlice';
+import { RootState } from '../store/store';
 
-type Prop = {
-	user: GithubUserModel
-}
-
-function NavBar(prop: any) {
-	const { user } = prop;
+function NavBar() {
 	const dispatch = useDispatch();
+	const router = useRouter();
+
+	const isAuthenticated = useSelector((state: RootState) => isAuthenticatedSelector(state.auth));
+	const userName = useSelector((state: RootState) => usernameSelector(state.auth));
+
+	useEffect(() => {
+		if (isAuthenticated === false) {
+			router.push('/login');
+		}
+	}, [isAuthenticated, router])
 
 	const logoutHandler = () => {
 		dispatch(logoutAsync());
-		Router.reload();
 	}
 
 	return (
@@ -29,7 +32,10 @@ function NavBar(prop: any) {
 					<Link href='/user'>User</Link>
 				</li>
 			</ul>
-			{user ? <button className="p-5 text-base font-medium" onClick={logoutHandler}>Logout</button> : ''}
+			<div>
+				{userName !== '' ? <span>{userName}</span> : ''}
+				{isAuthenticated ? <button className="p-5 text-base font-medium" onClick={logoutHandler}>Logout</button> : ''}
+			</div>
 		</nav >
 	)
 }
