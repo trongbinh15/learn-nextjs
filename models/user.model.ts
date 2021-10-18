@@ -4,3 +4,7 @@ export interface IUser {
   phone: string;
   email: string;
 }
+export interface GithubUserModel {
+  login: string;
+  avatarUrl: string;
+}

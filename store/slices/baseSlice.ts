@@ -1,4 +1,5 @@
 import { createSelector, createSlice, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
+import { loginAsync } from './authSlice';
 import { addTaskAsync, deleteTaskAsync, fetchTasksAsync, updateTaskAsync } from './taskSlice';
 import { addUserAsync, deleteUserAsync, fetchUsersAsync, updateUserAsync } from './usersSlice';
 
@@ -29,7 +30,9 @@ const baseSlice = createSlice({
           fetchTasksAsync,
           addTaskAsync,
           updateTaskAsync,
-          deleteTaskAsync),
+          deleteTaskAsync,
+          loginAsync,
+        ),
         (state) => {
           state.loading = true;
           state.error = '';
@@ -45,7 +48,9 @@ const baseSlice = createSlice({
           fetchTasksAsync,
           addTaskAsync,
           updateTaskAsync,
-          deleteTaskAsync),
+          deleteTaskAsync,
+          loginAsync,
+        ),
         (state) => {
           state.loading = false;
           state.error = '';
@@ -61,7 +66,8 @@ const baseSlice = createSlice({
           fetchTasksAsync,
           addTaskAsync,
           updateTaskAsync,
-          deleteTaskAsync
+          deleteTaskAsync,
+          loginAsync,
         ),
         (state, action) => {
           state.loading = false;

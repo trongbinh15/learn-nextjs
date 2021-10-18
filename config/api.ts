@@ -1,4 +1,4 @@
-export const localApi = {
+export const localApiRoute = {
   getAllUsers: "/api/users",
   getUserById: "/api/users/?id={id}",
   addUser: "/api/users",
@@ -10,5 +10,8 @@ export const localApi = {
   addTask: "/api/tasks",
   updateTask: "/api/tasks/?id={id}",
   deleteTask: "/api/tasks/?id={id}",
+
+  login: "/api/login",
+  logout: "/api/logout",
 };
 

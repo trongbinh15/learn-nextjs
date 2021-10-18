@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { localApi } from '../../../config/api';
+import { localApiRoute } from '../../config/api';
 
 
 export type ITask = {
@@ -17,7 +17,7 @@ export const fetchTasksAsync = createAsyncThunk(
   'tasks/fetchTasks',
   async (_, thunkApi) => {
     try {
-      const response = await axios.get<ITask[]>(localApi.getAllTask);
+      const response = await axios.get<ITask[]>(localApiRoute.getAllTask);
       return response.data;
     } catch (error: any) {
       if (!error.response) {
@@ -32,7 +32,7 @@ export const deleteTaskAsync = createAsyncThunk(
   'tasks/deleteTask',
   async (id: string, thunkApi) => {
     try {
-      await axios.delete(localApi.deleteTask.replace('{id}', id));
+      await axios.delete(localApiRoute.deleteTask.replace('{id}', id));
       return id;
     } catch (error: any) {
       if (!error.response) {
@@ -47,7 +47,7 @@ export const addTaskAsync = createAsyncThunk(
   'tasks/addTask',
   async (model: ITask, thunkApi) => {
     try {
-      const response = await axios.post<ITask>(localApi.addTask, model);
+      const response = await axios.post<ITask>(localApiRoute.addTask, model);
       return response.data;
     } catch (error: any) {
       if (!error.response) {
@@ -62,7 +62,7 @@ export const updateTaskAsync = createAsyncThunk(
   'tasks/updateTask',
   async (model: ITask, thunkApi) => {
     try {
-      const response = await axios.put<ITask>(localApi.updateTask.replace('{id}', model.id), model);
+      const response = await axios.put<ITask>(localApiRoute.updateTask.replace('{id}', model.id), model);
       return { id: model.id, model: response.data };
     } catch (error: any) {
       if (!error.response) {
@@ -80,7 +80,11 @@ const initialState: TaskState = {
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
-  reducers: {},
+  reducers: {
+    setTasks: (state, action: PayloadAction<ITask[]>) => {
+      state.tasks = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasksAsync.fulfilled, (state, action) => {
@@ -108,5 +112,7 @@ const taskByUserId = (_: TaskState, userId: string) => userId;
 export const taskByUserIdSelector = createSelector(tasks, taskByUserId,
   (tasks, userId) => tasks.filter(x => x.userId === userId)
 );
+
+export const { setTasks } = tasksSlice.actions
 
 export default tasksSlice.reducer;
